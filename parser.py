@@ -1,17 +1,16 @@
 #!/usr/bin/python
 import re, os, json
 import matplotlib.pyplot as plt
+import requests
 
 count={}
 
 i=0
 #a=0; c=0; d=0; e=0; f=0; g=0; h=0; i=0; k=0; l=0; m=0; n=0; p=0; q=0; r=0; s=0; t=0; v=0; w=0; x=0; y=0;
 
-
 outfile = open('/home/pragya/Documents/GitHub/Protein-Sequence-Parser/outfile.txt', 'w+')
 
-
-with open('/home/pragya/Downloads/Danio_rerio.Zv9.pep.abinitio.fa', 'r') as infile:
+with open('/home/pragya/Downloads/Rattus_norvegicus.Rnor_5.0.pep.abinitio.fa', 'r') as infile:
 	data = infile.readlines()
 	for line in data:
 		if line.startswith('>') or line.startswith('transcript_biotype'):
@@ -35,10 +34,13 @@ with open('/home/pragya/Documents/GitHub/Protein-Sequence-Parser/outfile.txt', '
 	"""
 
 	for char in seq:
-		if char in count:
-			count[char] = count[char] + 1
+		if char=='\n' or char=='*' or char=='X':
+			pass
 		else:
-			count[char] = 1
+			if char in count:
+				count[char] = count[char] + 1
+			else:
+				count[char] = 1
 	print(count)
 
 a=json.dumps(count, sort_keys=True, indent=4, separators=(',', ': '))

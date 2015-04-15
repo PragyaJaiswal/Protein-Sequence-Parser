@@ -7,7 +7,7 @@ Implemented for downloading 'proteome' sequence
 data, of 'mammals', from the Ensembl FTP server.
 '''
 
-# Specify the mammals you wish to download data for in this.
+# Specify the mammals you wish to download data for in this. Only provide scientific names for each of them, as shown.
 mammals = ['Homo sapiens', 'Pan troglodytes', 'Gorilla gorilla gorilla', 'Macaca mulatta', 'Rattus norvegicus', 'Mus musculus']
 
 # Specify the location where you wish to store the downloaded data.

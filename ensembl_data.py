@@ -95,7 +95,6 @@ def ftp_download():
 	print(ftp.pwd())
 
 if __name__ == '__main__':
-	main()
 	path_to_dir(store)
 	edit()
 	ftp_download()

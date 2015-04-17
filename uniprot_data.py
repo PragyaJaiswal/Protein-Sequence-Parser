@@ -14,54 +14,60 @@ species = 'Viruses'
 # Specify the location where you wish to store the downloaded data.
 store = '/home/pragya/Documents/GitHub/Protein-Sequence-Parser/Data/' + str(species) + '/'
 
-# Create the specified folder if it does not already exist.
-if not os.path.exists(store) and not store == '':
-	os.makedirs(store)
+def path_to_dir(store):
+	# Create the specified folder if it does not already exist.
+	if not os.path.exists(store) and not store == '':
+		os.makedirs(store)
 
-# If no directory is specified to store the data, store it on user's desktop.
-if store == '':
-	home = os.path.expanduser('~')
-	store = home + '/Desktop/' + str(species) + '/'
-	os.makedirs(store)
+	# If no directory is specified to store the data, store it on user's desktop.
+	if store == '':
+		home = os.path.expanduser('~')
+		store = home + '/Desktop/' + str(species) + '/'
+		os.makedirs(store)
 
 i = 0
 j = 0
-p = 0
 
 '''
 FTP Stuff here.
 '''
-ftp_host = 'ftp.uniprot.org'
-ftp_user = 'anonymous'
-ftp_pass = ''
-ftp_path = '/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes'
 
-ftp = FTP(ftp_host)
-ftp.login(ftp_user, ftp_pass)
-ftp.getwelcome()
-ftp.cwd(ftp_path)
+def ftp_download():
+	ftp_host = 'ftp.uniprot.org'
+	ftp_user = 'anonymous'
+	ftp_pass = ''
+	ftp_path = '/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes'
 
-dirs = ftp.nlst()
-# print(dirs)
+	ftp = FTP(ftp_host)
+	ftp.login(ftp_user, ftp_pass)
+	ftp.getwelcome()
+	ftp.cwd(ftp_path)
 
-# Navigate to the required directory and thereby download data.
-for dir in dirs:
-	if re.search(species, dir):
-		path = ftp_path + '/' + str(species)
-		print(path)
-		ftp.cwd(path)
-		types = ftp.nlst()
-		# print(types)
-		for x in types:
-			if not re.search('DNA.fasta.gz', x) and re.search('fasta.gz', x):
-				final = path + '/' + str(x)
-				print(final)
-				fullfilename = os.path.join(store + str(x))
-				urllib.urlretrieve('ftp://' + ftp_host + str(final), fullfilename)
-				p+=1
-			else:
-				pass
+	dirs = ftp.nlst()
+	# print(dirs)
+	p = 0
 
-print(p)
+	# Navigate to the required directory and thereby download data.
+	for dir in dirs:
+		if re.search(species, dir):
+			path = ftp_path + '/' + str(species)
+			# print(path)
+			ftp.cwd(path)
+			types = ftp.nlst()
+			for x in types:
+				if not re.search('DNA.fasta.gz', x) and re.search('fasta.gz', x):
+					final = path + '/' + str(x)
+					# print(final)
+					fullfilename = os.path.join(store + str(x))
+					urllib.urlretrieve('ftp://' + ftp_host + str(final), fullfilename)
+					p+=1
+				else:
+					pass
 
-print(ftp.pwd())
+	print("Number od viruses: " + str(p))
+
+	print(ftp.pwd())
+
+if __name__ == '__main__':
+	path_to_dir(store)
+	ftp_download()

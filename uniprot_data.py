@@ -12,7 +12,7 @@ data from the Uniprot FTP server.
 species = 'Viruses'
 
 # Specify the location where you wish to store the downloaded data.
-store = '/home/pragya/Documents/GitHub/Protein-Sequence-Parser/Data/' + str(species) + '/'
+store = './dat/' + str(species) + '/'
 
 def path_to_dir(store):
 	# Create the specified folder if it does not already exist.
@@ -22,7 +22,7 @@ def path_to_dir(store):
 	# If no directory is specified to store the data, store it on user's desktop.
 	if store == '':
 		home = os.path.expanduser('~')
-		store = home + '/Desktop/' + str(species) + '/'
+		store = './dat/' + str(species) + '/'
 		os.makedirs(store)
 
 i = 0
@@ -64,7 +64,7 @@ def ftp_download():
 				else:
 					pass
 
-	print("Number od viruses: " + str(p))
+	print("Number of viruses: " + str(p))
 
 	print(ftp.pwd())
 

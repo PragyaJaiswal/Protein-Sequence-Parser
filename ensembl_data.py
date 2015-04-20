@@ -23,7 +23,7 @@ mammals = [
 
 # Specify the location where you wish to store the downloaded data.
 species = 'Mammals'
-store = '/home/pragya/Documents/GitHub/Protein-Sequence-Parser/Data/' + str(species) + '/'
+store = './dat/' + str(species) + '/'
 
 def path_to_dir(store):
 	# Create the specified folder if it does not already exist.

@@ -33,7 +33,7 @@ def path_to_dir(store):
 	# If no directory is specified to store the data, store it on user's desktop.
 	if store == '':
 		home = os.path.expanduser('~')
-		store = home + '/Desktop/' + str(species) + '/'
+		store = './dat/' + str(species) + '/'
 		os.makedirs(store)
 
 def edit():

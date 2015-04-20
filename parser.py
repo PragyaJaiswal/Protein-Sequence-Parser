@@ -19,7 +19,7 @@ def mammals():
 	Specify the location where you wish to store the files containing only the
 	entire proteome sequence and not the FASTA format sequence.
 	'''	
-	out = '/home/pragya/Documents/GitHub/Protein-Sequence-Parser/Output/' + str(ensembl_data.species) + '/'
+	out = './output/' + str(ensembl_data.species) + '/'
 	
 	# List of all the files that have been downloaded.	
 	files=os.listdir(ensembl_data.store)
@@ -49,7 +49,7 @@ def viruses():
 	Specify the location where you wish to store the files containing only the
 	entire proteome sequence and not the FASTA format sequence.
 	'''	
-	out = '/home/pragya/Documents/GitHub/Protein-Sequence-Parser/Output/' + str(uniprot_data.species) + '/'
+	out = './output/' + str(uniprot_data.species) + '/'
 
 	# List of all the files that have been downloaded.	
 	files=os.listdir(uniprot_data.store)

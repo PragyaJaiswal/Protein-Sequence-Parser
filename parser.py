@@ -8,8 +8,9 @@ import uniprot_data
 
 # store :- Location where the downloaded data is stored.
 
-global count
+global count, total
 count = {}	# Contains the frequency of occurence of each amino acid in the proteome sequence.
+total = {}
 
 
 def mammals():
@@ -21,6 +22,9 @@ def mammals():
 	'''	
 	out = './out/' + str(ensembl_data.species) + '/'
 	
+	# Create the specified folder if it does not already exist.
+	path_to_dir(out)
+
 	# List of all the files that have been downloaded.	
 	files = os.listdir(ensembl_data.store)
 
@@ -35,7 +39,7 @@ def mammals():
 					pass
 				else:
 					outfile.write(line)
-				print("Number of lines written: " + str(i))
+				# print("Number of lines written: " + str(i))
 				i+=1
 			infile.close()
 			print("Amino acid sequence written to the requested file for file " + str(file))
@@ -54,15 +58,7 @@ def viruses():
 	'''	
 	out = './out/' + str(uniprot_data.species) + '/'
 
-	# Create the specified folder if it does not already exist.
-	if not os.path.exists(out) and not out == '':
-		os.makedirs(out)
-
-	# If no directory is specified to store the data, store it on user's desktop.
-	if out == '':
-		home = os.path.expanduser('~')
-		out = './' + str(uniprot_data.species) + '/'
-		os.makedirs(out)
+	path_to_dir(out)
 
 
 	# List of all the files that have been downloaded.	
@@ -131,15 +127,41 @@ def parse(out):
 					else:
 						count[char] = 1
 			print(count)
+
 		j+=1
-		print(j)
+		print('No. of files processed: ' + str(j))
 		jsonify(count)
+		add(count)
 		plot(count)
+
+
+def add(count):
+	for x in count:
+		if x in total:
+			total[x] = total[x] + count[x]
+		else:
+			total[x] = count[x]
+	print('Printing the total amino acids in the species for the files processed: ')
+	jsonify(total)
+
+
+def path_to_dir(out):
+	# Create the specified folder if it does not already exist.
+	if not os.path.exists(out) and not out == '':
+		os.makedirs(out)
+
+	# If no directory is specified to store the data, store it on user's desktop.
+	if out == '':
+		home = os.path.expanduser('~')
+		out = './' + str(uniprot_data.species) + '/'
+		os.makedirs(out)
+
 
 # Export dictionary to JSON for showing count in a presentable form.
 def jsonify(count):
 	a = json.dumps(count, sort_keys=True, indent=4, separators=(',', ': '))
 	print(a)
+
 
 # Plot a bar graph for the number of each amino acid in the proteome sequence.
 def plot(count):
@@ -147,6 +169,7 @@ def plot(count):
 	plt.xticks(range(len(count)), list(count.keys()))
 	plt.show()
 
+
 if __name__ == '__main__':
-	# mammals()
+	mammals()
 	viruses()

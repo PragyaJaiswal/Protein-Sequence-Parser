@@ -8,10 +8,10 @@ import uniprot_data
 
 # store :- Location where the downloaded data is stored.
 
-global count, total
+global count, total, save
 count = {}	# Contains the frequency of occurence of each amino acid in the proteome sequence.
 total = {}
-
+save = {}
 
 def mammals():
 	i = 0
@@ -105,7 +105,7 @@ def viruses():
 
 def parse(out):
 	datafiles = os.listdir(out)
-	print(datafiles)
+	# print(datafiles)
 	j = 0
 	for file in datafiles:
 		with open(out + str(file), 'r') as outfile:
@@ -127,12 +127,27 @@ def parse(out):
 						count[char] = 1
 			print(count)
 
+		if str(file) in save:
+			pass
+		else:
+			# print('here')
+			# print(count)
+			save[str(file)] = count
+			# print(save[str(file)])
+			# print(save)
+
 		j+=1
 		print('No. of files processed: ' + str(j))
 		jsonify(count)
 		add(count)
 		plot(count, str(file))
-	percentage(count, total)
+		# if j == 5:
+		# 	break
+	
+	# print(len(save))
+	jsonify(save)
+	for x in save:
+		percentage(save[str(file)], total)
 
 
 def add(count):
@@ -150,17 +165,17 @@ def percentage(count, total):
 	k = 0
 	for i in count.keys():
 		if not len(perc) == 21:
-			print('i:' + str(i))
 			j = [j for j in total.keys()]
-			print('j[k] : ' + str(j[k]))
 			if i == str(j[k]):
-				print(int(count[i]))
+				print('i: ' + str(int(count[i])))
 				print(int(total[i]))
 				perc[i] = (float(count[i])/float(total[j[k]]))*100
 				k+=1
 			else:
 				pass
 	print(perc)
+	jsonify(perc)
+	plot(perc, 'Percentage of amino acid in each organism with respect to the total amino acid in its species.')
 
 
 def path_to_dir(out):

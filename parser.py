@@ -25,7 +25,7 @@ def mammals():
 	# Create the specified folder if it does not already exist.
 	path_to_dir(out)
 
-	# List of all the files that have been downloaded.	
+	# List of all the files that have been downloaded.
 	files = os.listdir(ensembl_data.store)
 
 	print("Mammal proteomes being processed.")
@@ -63,7 +63,6 @@ def viruses():
 
 	# List of all the files that have been downloaded.	
 	files=os.listdir(uniprot_data.store)
-	print(type(files))
 
 	print("Virus proteomes being processed.")
 
@@ -132,7 +131,8 @@ def parse(out):
 		print('No. of files processed: ' + str(j))
 		jsonify(count)
 		add(count)
-		plot(count)
+		plot(count, str(file))
+	percentage(count, total)
 
 
 def add(count):
@@ -143,6 +143,24 @@ def add(count):
 			total[x] = count[x]
 	print('Printing the total amino acids in the species for the files processed: ')
 	jsonify(total)
+
+
+def percentage(count, total):
+	perc = {}
+	k = 0
+	for i in count.keys():
+		if not len(perc) == 21:
+			print('i:' + str(i))
+			j = [j for j in total.keys()]
+			print('j[k] : ' + str(j[k]))
+			if i == str(j[k]):
+				print(int(count[i]))
+				print(int(total[i]))
+				perc[i] = (float(count[i])/float(total[j[k]]))*100
+				k+=1
+			else:
+				pass
+	print(perc)
 
 
 def path_to_dir(out):
@@ -164,10 +182,12 @@ def jsonify(count):
 
 
 # Plot a bar graph for the number of each amino acid in the proteome sequence.
-def plot(count):
+def plot(count, name):
+	plt.figure().canvas.set_window_title(str(name))
 	plt.bar(range(len(count)), count.values(), align='center')
 	plt.xticks(range(len(count)), list(count.keys()))
 	plt.show()
+	# plt.savefig(str(name) + '.png')
 
 
 if __name__ == '__main__':

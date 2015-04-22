@@ -10,6 +10,10 @@ import uniprot_data
 global count, total, save
 count = {}	# Contains the frequency of occurence of each amino acid in the proteome sequence.
 
+"""
+The script parses the amino acid sequence sequence for the organism and 
+thereby plots the amino acid content in each protein.
+"""
 
 def mammals():
 	i = 0
@@ -37,6 +41,10 @@ def mammals():
 		# if j == 2:
 		# 	break
 
+'''
+The amino acid content in each protein of the organism is calculated here.
+'''
+
 def parse(file, count):
 	with gzip.open(ensembl_data.store + str(file), 'r') as infile:
 		data = infile.readlines()
@@ -53,7 +61,7 @@ def parse(file, count):
 				# 	break
 				count = {}
 				continue
-			elif line.startswith('transcript_biotype'):
+			elif line.startswith('transcript_biotype') or line.startswith(''):
 				continue
 			else:
 				for char in line:

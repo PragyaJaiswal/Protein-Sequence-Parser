@@ -109,14 +109,15 @@ def parse(out):
 	j = 0
 	for file in datafiles:
 		with open(out + str(file), 'r') as outfile:
-			print("Reading sequence from file.")
+			print("Reading sequence from file: " + str(file))
 			seq = outfile.read()
 
 			"""
 			Counts the occurence of each
 			character in the sequence.
 			"""
-
+			
+			count={}		# Fixed the reported error. Credits - Devesh Khandelwal.
 			for char in seq:
 				if char == '\n' or char == '\x00' or char == '*' or char == 'X':
 					pass
@@ -130,10 +131,8 @@ def parse(out):
 		if str(file) in save:
 			pass
 		else:
-			# print('here')
-			# print(count)
 			save[str(file)] = count
-			# print(save[str(file)])
+			print(save[str(file)])
 			# print(save)
 
 		j+=1
@@ -147,7 +146,7 @@ def parse(out):
 	# print(len(save))
 	jsonify(save)
 	for x in save:
-		percentage(save[str(file)], total)
+		percentage(save[x], total, str(x))
 
 
 def add(count):
@@ -160,7 +159,7 @@ def add(count):
 	jsonify(total)
 
 
-def percentage(count, total):
+def percentage(count, total, name=None):
 	perc = {}
 	k = 0
 	for i in count.keys():
@@ -173,9 +172,9 @@ def percentage(count, total):
 				k+=1
 			else:
 				pass
-	print(perc)
+	print('Percentage of amino acid in each organism with respect to the total amino acid in its species.')
 	jsonify(perc)
-	plot(perc, 'Percentage of amino acid in each organism with respect to the total amino acid in its species.')
+	plot(perc, name)
 
 
 def path_to_dir(out):

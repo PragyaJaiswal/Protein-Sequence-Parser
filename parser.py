@@ -148,8 +148,8 @@ def parse(out):
 	
 	# print(len(save))
 	jsonify(save)
-	# for x in save:
-	# 	percentage(save[x], total, str(x))
+	for x in save:
+		percentage(save[x], total, str(x))
 
 
 '''
@@ -214,7 +214,7 @@ def jsonify(count):
 def plot(count, name):
 	plt.figure().canvas.set_window_title(str(name))
 	plt.bar(range(len(count)), count.values(), align='center')
-	plt.xticks(range(len(count)), list(count.keys()))
+	# plt.xticks(range(len(count)), list(count.keys()))
 	plt.show()
 	# plt.savefig(str(name) + '.png')
 

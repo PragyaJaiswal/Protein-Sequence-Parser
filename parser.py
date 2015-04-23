@@ -142,7 +142,7 @@ def parse(out):
 		print('No. of files processed: ' + str(j))
 		jsonify(count)
 		add(count)
-		plot(count, str(file))
+		plot(count, name)
 		# if j == 5:
 		# 	break
 	
@@ -197,7 +197,7 @@ def path_to_dir(out):
 	if not os.path.exists(out) and not out == '':
 		os.makedirs(out)
 
-	# If no directory is specified to store the data, store it on user's desktop.
+	# If no directory is specified to store the data, store it in the current directory of the user..
 	if out == '':
 		home = os.path.expanduser('~')
 		out = './' + str(uniprot_data.species) + '/'
@@ -212,11 +212,13 @@ def jsonify(count):
 
 # Plot a bar graph for the number of each amino acid in the proteome sequence.
 def plot(count, name):
+	figs = './plots/' + str(uniprot_data.species) + '/'
+	path_to_dir(figs)
+	filename = str(figs) + str(name) + '.png'
 	plt.figure().canvas.set_window_title(str(name))
 	plt.bar(range(len(count)), count.values(), align='center')
 	# plt.xticks(range(len(count)), list(count.keys()))
-	plt.show()
-	# plt.savefig(str(name) + '.png')
+	plt.savefig(filename)
 
 
 if __name__ == '__main__':

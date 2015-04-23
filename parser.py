@@ -109,8 +109,8 @@ def viruses():
 
 def parse(out, species):
 	datafiles = os.listdir(out)
-	# print(datafiles)
 	j = 0
+	save = {}
 	for file in datafiles:
 		with open(out + str(file), 'r') as outfile:
 			print("Reading sequence from file: " + str(file))
@@ -149,6 +149,7 @@ def parse(out, species):
 	
 	# print(len(save))
 	jsonify(save)
+	print(species)
 	for x in save:
 		name = str.split(str(x), '.')[0]
 		percentage(save[x], total, species, name)
@@ -177,6 +178,7 @@ Example - Suppose we wish to know to percentage of an amino acid, say L, in a
 virus X when compared to the total amount of L in the viruses species.
 '''
 def percentage(count, total, species, name=None):
+	print(species)
 	perc = {}
 	k = 0
 	for i in count.keys():
@@ -219,7 +221,7 @@ def plot(count, species, name):
 	filename = str(figs) + str(name) + '.png'
 	plt.figure().canvas.set_window_title(str(name))
 	plt.bar(range(len(count)), count.values(), align='center')
-	# plt.xticks(range(len(count)), list(count.keys()))
+	plt.xticks(range(len(count)), list(count.keys()))
 	plt.savefig(filename)
 
 

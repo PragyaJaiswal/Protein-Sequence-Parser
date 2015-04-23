@@ -6,11 +6,14 @@ from ftplib import FTP
 import ensembl_data
 import uniprot_data
 
-# store :- Location where the downloaded data is stored.
-
 global count, total, save
 count = {}	# Contains the frequency of occurence of each amino acid in the proteome sequence.
-total = {}
+total = {}	# Contains the total no. of each amino acid in the species.
+
+'''
+save :- is a dictionary that contains the virus file name as keys and another
+dictionary (containing amino acid as key and its corresponding frequency as values) as values.
+'''
 save = {}
 
 def mammals():
@@ -45,12 +48,14 @@ def mammals():
 			print("Amino acid sequence written to the requested file for file " + str(file))
 	parse(out)
 
+'''
+Creates another output file with the entire proteome sequene only
+This proteome sequene is no more in FASTA format.
+'''
 
 def viruses():
 	i = 0
 	j = 0
-	listing = []
-	print(type(listing))
 
 	'''
 	Specify the location where you wish to store the files containing only the
@@ -59,7 +64,6 @@ def viruses():
 	out = './out/' + str(uniprot_data.species) + '/'
 
 	path_to_dir(out)
-
 
 	# List of all the files that have been downloaded.	
 	files=os.listdir(uniprot_data.store)
@@ -70,7 +74,7 @@ def viruses():
 		j+=1
 		print(j)
 
-		print(bool(re.search('additional', str(file))))
+		# print(bool(re.search('additional', str(file))))
 
 		if bool(re.search('additional', file)):
 			with gzip.open(uniprot_data.store + str(file), 'r') as reading:
@@ -87,7 +91,7 @@ def viruses():
 				data = infile.readlines()
 				filename = out + str((str(file)).split('.')[0]) + '.txt'
 				outfile = open(out + str((str(file)).split('.')[0]) + '.txt', 'w+')
-				print(str(outfile))
+				# print(str(outfile))
 				for line in data:
 					if line.startswith('>') or line.startswith('transcript_biotype'):
 						pass
@@ -98,7 +102,7 @@ def viruses():
 				pre = filename
 				infile.close()
 				print("Amino acid sequence written to the requested file for file " + str(file))
-		# if j == 60:
+		# if j == 10:
 		# 	break
 	parse(out)
 
@@ -126,13 +130,12 @@ def parse(out):
 						count[char] = count[char] + 1
 					else:
 						count[char] = 1
-			print(count)
 
 		if str(file) in save:
 			pass
 		else:
 			save[str(file)] = count
-			print(save[str(file)])
+			# print(save[str(file)])
 			# print(save)
 
 		j+=1
@@ -145,10 +148,16 @@ def parse(out):
 	
 	# print(len(save))
 	jsonify(save)
-	for x in save:
-		percentage(save[x], total, str(x))
+	# for x in save:
+	# 	percentage(save[x], total, str(x))
 
 
+'''
+Adds the total number of amino acids in the species.
+For example, we wish to know the number of a particular amino acid, say L, in
+the viruses species.
+total :-  Contains the total number of each amino acid in the species.
+'''
 def add(count):
 	for x in count:
 		if x in total:
@@ -159,6 +168,12 @@ def add(count):
 	jsonify(total)
 
 
+'''
+Calculates the percentage of each amino acid for a organism when compared to
+the amount of that amino acid in the whole species.
+Example - Suppose we wish to know to percentage of an amino acid, say L, in a
+virus X when compared to the total amount of L in the viruses species.
+'''
 def percentage(count, total, name=None):
 	perc = {}
 	k = 0

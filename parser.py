@@ -46,7 +46,7 @@ def mammals():
 				i+=1
 			infile.close()
 			print("Amino acid sequence written to the requested file for file " + str(file))
-	parse(out)
+	parse(out, str(ensembl_data.species))
 
 '''
 Creates another output file with the entire proteome sequene only
@@ -104,10 +104,10 @@ def viruses():
 				print("Amino acid sequence written to the requested file for file " + str(file))
 		# if j == 10:
 		# 	break
-	parse(out)
+	parse(out, str(uniprot_data.species))
 
 
-def parse(out):
+def parse(out, species):
 	datafiles = os.listdir(out)
 	# print(datafiles)
 	j = 0
@@ -142,14 +142,16 @@ def parse(out):
 		print('No. of files processed: ' + str(j))
 		jsonify(count)
 		add(count)
-		plot(count, name)
+		name = str.split(file, '.')[0]
+		plot(count, species, name)
 		# if j == 5:
 		# 	break
 	
 	# print(len(save))
 	jsonify(save)
 	for x in save:
-		percentage(save[x], total, str(x))
+		name = str.split(str(x), '.')[0]
+		percentage(save[x], total, species, name)
 
 
 '''
@@ -174,7 +176,7 @@ the amount of that amino acid in the whole species.
 Example - Suppose we wish to know to percentage of an amino acid, say L, in a
 virus X when compared to the total amount of L in the viruses species.
 '''
-def percentage(count, total, name=None):
+def percentage(count, total, species, name=None):
 	perc = {}
 	k = 0
 	for i in count.keys():
@@ -189,7 +191,7 @@ def percentage(count, total, name=None):
 				pass
 	print('Percentage of amino acid in each organism with respect to the total amino acid in its species.')
 	jsonify(perc)
-	plot(perc, name)
+	plot(perc, species, name)
 
 
 def path_to_dir(out):
@@ -211,8 +213,8 @@ def jsonify(count):
 
 
 # Plot a bar graph for the number of each amino acid in the proteome sequence.
-def plot(count, name):
-	figs = './plots/' + str(uniprot_data.species) + '/'
+def plot(count, species, name):
+	figs = './plots/' + str(species) + '/'
 	path_to_dir(figs)
 	filename = str(figs) + str(name) + '.png'
 	plt.figure().canvas.set_window_title(str(name))

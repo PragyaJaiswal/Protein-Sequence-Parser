@@ -223,6 +223,7 @@ def plot(count, species, name):
 	plt.bar(range(len(count)), count.values(), align='center')
 	plt.xticks(range(len(count)), list(count.keys()))
 	plt.savefig(filename)
+	plt.close()
 
 
 if __name__ == '__main__':

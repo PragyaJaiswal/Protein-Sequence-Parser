@@ -16,6 +16,11 @@ response = requests.get(url)
 soup = BeautifulSoup(response.content)
 
 print(soup.prettify())
+num = 0
 
 for link in soup.find_all('a'):
-	print(link.get('href'))
+	redirect = link.get('href')
+	if re.search('uniprot', str(redirect)):
+		num+=1
+		print(redirect)
+print('No. of preoteomes to be retrieved: ' + str(num))

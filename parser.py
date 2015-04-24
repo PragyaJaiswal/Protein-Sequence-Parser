@@ -232,4 +232,4 @@ def plot(count, species, name, location=None):
 
 if __name__ == '__main__':
 	mammals()
-	# viruses()
+	viruses()

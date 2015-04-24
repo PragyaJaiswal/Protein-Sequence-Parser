@@ -55,7 +55,7 @@ def parse(file, count, species):
 				if not i == 0:
 					print('No. of genes processed: ' + str(i))
 					jsonify(count)
-					plot(count, species, str(file), 'Protein: ' + str(i))
+					plot(count, species, str(file), 'Protein ' + str(i))
 				i+=1
 				# if i > 10:
 				# 	break

@@ -36,7 +36,7 @@ def mammals():
 	for file in files:
 		j+=1
 		count = {}
-		parse(str(file), count)
+		parse(str(file), count, str(ensembl_data.species))
 		print('No. of files done: ' + str(j) + ', Last File: ' + str(file))
 		# if j == 2:
 		# 	break
@@ -45,7 +45,7 @@ def mammals():
 The amino acid content in each protein of the organism is calculated here.
 '''
 
-def parse(file, count):
+def parse(file, count, species):
 	with gzip.open(ensembl_data.store + str(file), 'r') as infile:
 		data = infile.readlines()
 		print('file: ' + str(file))
@@ -55,13 +55,13 @@ def parse(file, count):
 				if not i == 0:
 					print('No. of genes processed: ' + str(i))
 					jsonify(count)
-					plot(count, 'Protein: ' + str(i))
+					plot(count, species, str(file), 'Protein: ' + str(i))
 				i+=1
 				# if i > 10:
 				# 	break
 				count = {}
 				continue
-			elif line.startswith('transcript_biotype') or line.startswith(''):
+			elif line.startswith('transcript_biotype'):
 				continue
 			else:
 				for char in line:
@@ -94,12 +94,15 @@ def jsonify(count):
 
 
 # Plot a bar graph for the number of each amino acid in the proteome sequence.
-def plot(count, name):
+def plot(count, species, name, pro_num):
+	figs = './plots/' + str(species) + '/individual proteins/' + str(name) + '/'
+	path_to_dir(figs)
+	filename = str(figs) + str(pro_num)
 	plt.figure().canvas.set_window_title(str(name))
 	plt.bar(range(len(count)), count.values(), align='center')
 	plt.xticks(range(len(count)), list(count.keys()))
-	plt.show()
-	# plt.savefig(str(name) + '.png')
+	plt.savefig(filename)
+	plt.close()
 
 
 if __name__ == '__main__':

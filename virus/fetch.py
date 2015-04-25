@@ -29,7 +29,7 @@ def init(url):
 
 	# print(soup.prettify())
 	num = 0
-
+	# checks
 	for link in soup.find_all('a'):
 		redirect.append(str(link.get('href')))
 		num+=1

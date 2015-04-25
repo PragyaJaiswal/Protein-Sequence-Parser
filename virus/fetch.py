@@ -1,6 +1,7 @@
 #!/usr/bin/python
 import re, os, json, urllib, requests, httplib2
 from bs4 import BeautifulSoup
+from ftplib import FTP
 
 '''
 Script to find proteomes of all viruses whose hosts are
@@ -26,7 +27,6 @@ def init(url):
 	for link in soup.find_all('a'):
 		redirect.append(str(link.get('href')))
 		num+=1
-	# print(redirect)
 	return redirect
 
 		
@@ -41,14 +41,11 @@ def uniprot(urls):
 					tax_num = str(y.split('/')[2])
 					viruses.append(str(tax_num))
 			output = remove_duplicates(viruses)
-					# else:
-					# 	for x in viruses:
-					# 		if not tax_num == x:
-					# 			viruses.append(str(y.split('/')[2]))
-					# 		else:
-					# 			pass
 			print(output)
+		# if num == 3:
+		# 	break
 	print('No. of preoteomes to be retrieved: ' + str(num))
+	return output
 
 
 def remove_duplicates(viruses):
@@ -61,10 +58,64 @@ def remove_duplicates(viruses):
 	return output
 
 
-def taxonomy():
+def taxonomy(output):
 	pass
+
+
+'''
+FTP Stuff here.
+'''
+
+def ftp_download(output):
+	ftp_host = 'ftp.uniprot.org'
+	ftp_user = 'anonymous'
+	ftp_pass = ''
+	ftp_path = '/pub/databases/uniprot/current_release/knowledgebase/reference_proteomes/Viruses/'
+
+	ftp = FTP(ftp_host)
+	ftp.login(ftp_user, ftp_pass)
+	ftp.getwelcome()
+	ftp.cwd(ftp_path)
+
+	virus_names = ftp.nlst()
+	
+	print(output)
+	p = 0
+
+	# Navigate to the required directory and thereby download data.
+	for num in output:
+		for virus in virus_names:
+			if str(num) in str(virus):
+				if not re.search('DNA.fasta.gz', virus) and re.search('fasta.gz', virus):
+					final = ftp_path + str(virus)
+					print(final)
+					fullfilename = os.path.join(store + str(virus))
+					urllib.urlretrieve('ftp://' + ftp_host + str(final), fullfilename)
+					p+=1
+				else:
+					pass
+
+	print("Number of virus files downloaded: " + str(p))
+
+	print(ftp.pwd())
+
+
+def path_to_dir(out):
+	# Create the specified folder if it does not already exist.
+	if not os.path.exists(out) and not out == '':
+		os.makedirs(out)
+
+	# If no directory is specified to store the data, store it in the current directory of the user..
+	if out == '':
+		home = os.path.expanduser('~')
+		out = './' + str(uniprot_data.species) + '/'
+		os.makedirs(out)
+
 
 if __name__ == '__main__':
 	url = 'http://viralzone.expasy.org/all_by_species/678.html'
+	store = './dat/'
+	path_to_dir(store)
 	urls = init(url)
-	uniprot(urls)
+	output = uniprot(urls)
+	ftp_download(output)

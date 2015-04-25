@@ -48,8 +48,8 @@ def uniprot(urls):
 					viruses.append(str(tax_num))
 			output = remove_duplicates(viruses)
 			print(output)
-		if num == 3:
-			break
+		# if num == 3:
+		# 	break
 	print('No. of preoteomes to be retrieved: ' + str(num))
 	return output
 
@@ -165,7 +165,7 @@ def taxonomy(store):
 				print("Amino acid sequence written to the requested file for file " + str(file))
 		if j == 10:
 			break
-	# parse(out, str(species))
+	parser.parse(out, 'Viruses')
 
 
 if __name__ == '__main__':

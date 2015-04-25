@@ -59,3 +59,5 @@ target/
 out/
 dat/
 plots/
+virus/dat/
+virus/out/

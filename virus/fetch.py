@@ -39,7 +39,7 @@ def init(url):
 def uniprot(urls):
 	num = 0
 	for x in urls:
-		if re.search('uniprot', str(x)):
+		if re.search('uniprot', str(x)) and not re.search('uniprotkb', str(x)) and re.search('http://www.', str(x)):
 			num+=1
 			res = init(x)
 			for y in res:
@@ -47,7 +47,7 @@ def uniprot(urls):
 					tax_num = str(y.split('/')[2])
 					viruses.append(str(tax_num))
 			output = remove_duplicates(viruses)
-			print(output)
+			# print(output)
 		# if num == 3:
 		# 	break
 	print('No. of preoteomes to be retrieved: ' + str(num))
@@ -90,7 +90,7 @@ def ftp_download(output):
 			if str(num) in str(virus):
 				if not re.search('DNA.fasta.gz', virus) and re.search('fasta.gz', virus):
 					final = ftp_path + str(virus)
-					print(final)
+					# print(final)
 					fullfilename = os.path.join(store + str(virus))
 					urllib.urlretrieve('ftp://' + ftp_host + str(final), fullfilename)
 					p+=1
@@ -114,31 +114,33 @@ def path_to_dir(out):
 		os.makedirs(out)
 
 
-def taxonomy(store):
+def taxonomy(store, out = None, plot_loc = None):
 	i = 0
 	j = 0
-
+	
 	'''
 	Specify the location where you wish to store the files containing only the
 	entire proteome sequence and not the FASTA format sequence.
 	'''	
-	out = './out/' + 'Viruses/'
+	if out == None:
+		out = './out/' + 'human_viruses/'
 
 	path_to_dir(out)
 
 	# List of all the files that have been downloaded.	
 	files=os.listdir(store)
+	# print('Printing files: ' + str(files))
 
 	print("Virus proteomes being processed.")
 
-	for file in files:
+	for entry in files:
 		j+=1
 		print(j)
-
-		# print(bool(re.search('additional', str(file))))
-
-		if bool(re.search('additional', file)):
-			with gzip.open(store + str(file), 'r') as reading:
+		print(entry)
+		# print(bool(re.search('additional', str(entry))))
+		
+		if bool(re.search('additional', entry)):
+			with gzip.open(store + str(entry), 'r') as reading:
 				data = reading.readlines()
 				print('Pre: ' + str(pre))
 				prev = open(str(pre), 'w+')
@@ -148,10 +150,10 @@ def taxonomy(store):
 					else:
 						prev.write(line)
 		else:
-			with gzip.open(store + str(file), 'r') as infile:
+			with gzip.open(store + str(entry), 'r') as infile:
 				data = infile.readlines()
-				filename = out + str((str(file)).split('.')[0]) + '.txt'
-				outfile = open(out + str((str(file)).split('.')[0]) + '.txt', 'w+')
+				filename = out + str((str(entry)).split('.')[0]) + '.txt'
+				outfile = open(out + str((str(entry)).split('.')[0]) + '.txt', 'w+')
 				# print(str(outfile))
 				for line in data:
 					if line.startswith('>') or line.startswith('transcript_biotype'):
@@ -162,10 +164,10 @@ def taxonomy(store):
 					i+=1
 				pre = filename
 				infile.close()
-				print("Amino acid sequence written to the requested file for file " + str(file))
-		if j == 10:
-			break
-	parser.parse(out, 'Viruses')
+				print("Amino acid sequence written to the requested file for file " + str(entry))
+		# if j == 10:
+		# 	break
+	parser.parse(out, 'Viruses', str(plot_loc))
 
 
 if __name__ == '__main__':
@@ -175,4 +177,4 @@ if __name__ == '__main__':
 	urls = init(url)
 	output = uniprot(urls)
 	ftp_download(output)
-	taxonomy(store)
+	taxonomy(store, None, './plots/human_virus/')

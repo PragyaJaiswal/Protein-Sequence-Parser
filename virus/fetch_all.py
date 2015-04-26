@@ -15,11 +15,12 @@ Go to the respective virus proteome on uniprot and download the
 proteome of the virus.
 '''
 
-global hosts, viruses, output, hostnum
+global hosts, viruses, output, hostnum, tax_num
 hosts = []
 viruses = []
 output = []
 hostnum = []
+tax_num = []
 
 
 def host_species(url, search):
@@ -42,8 +43,7 @@ def host_species(url, search):
 				hostnum.extend(re.findall('\d+', str(link.get('href'))))
 			else:
 				pass
-	print(hostnum)
-	print(count)
+	print('Host number: ' + str(hostnum))
 	return hosts
 
 
@@ -102,7 +102,6 @@ def path_to_dir(out):
 
 
 def download(virus_url):
-	tax_num = []
 	print(virus_url)
 	response = requests.get(virus_url)
 
@@ -122,6 +121,7 @@ def download(virus_url):
 					tax = str(y.split('/')[2])
 					tax_num.append(tax)
 	output = remove_duplicates(tax_num)
+	print(output)
 	return output
 			
 
@@ -160,7 +160,7 @@ def ftp_download(output, store):
 
 	print("Number of virus files downloaded: " + str(p))
 	print(ftp.pwd())
-	fetch.taxonomy(store, None, './out/vertebrate_viruses/')
+	# fetch.taxonomy(store, None, './out/vertebrate_viruses/')
 
 
 if __name__ == '__main__':
@@ -169,13 +169,12 @@ if __name__ == '__main__':
 	store = './dat/human_virus/'
 	path_to_dir(store)
 	hosts = host_species(url, 'all_by_protein')
-	print(hosts)
 	print('Done hosts. Finding viruses for each host now.')
 	genetic = ['236', '238', '293', '294', '237', '295', '235', '283']
+	print(hosts)
 	for x in hosts:
-		host+=1
 		if '655' in str(x):
-			# Vertebrates
+			# Viruses that attack Vertebrates
 			store = './dat/vertebrate_virus/'
 			path_to_dir(store)
 			unwanted_vert = [
@@ -190,8 +189,9 @@ if __name__ == '__main__':
 				virus_url = 'http://viralzone.expasy.org' + str(virus)
 				virus_tax_num = download(virus_url)
 				ftp_download(virus_tax_num, store)
+			fetch.taxonomy(store, './out/vertebrate_virus/', None)
 		elif '654' in str(x):
-			# Invertebrates
+			# Viruses that attack Invertebrates
 			unwanted_vert = [
 				'529', '139', '13', '19', '144', '4747', '147', '173',
 				'103', '2957', '162', '104', '126', '36', '792', '129',
@@ -200,8 +200,13 @@ if __name__ == '__main__':
 			unwanted_vert.extend(genetic)
 			names = viruses('http://viralzone.expasy.org' + str(x), 'all_by_species', unwanted_vert)
 			print(names)
+			for virus in names:
+				virus_url = 'http://viralzone.expasy.org' + str(virus)
+				virus_tax_num = download(virus_url)
+				ftp_download(virus_tax_num, store)
+			fetch.taxonomy(store, './out/invertebrate_virus/', None)
 		elif '658' in str(x):
-			# Eukaryotic organism
+			# Viruses that attack Eukaryotic organism
 			unwanted_vert = [
 				'4740', '17', '145', '166', '593', '167', '2996', '168',
 				'104', '161', '738', '2897', '177', '730', '46'
@@ -209,8 +214,15 @@ if __name__ == '__main__':
 			unwanted_vert.extend(genetic)
 			names = viruses('http://viralzone.expasy.org' + str(x), 'all_by_species', unwanted_vert)
 			print(names)
+			for virus in names:
+				virus_url = 'http://viralzone.expasy.org' + str(virus)
+				virus_tax_num = download(virus_url)
+				ftp_download(virus_tax_num, store)
+			fetch.taxonomy(store, './out/eukaryotic_organism_virus/', None)
 		elif '256' in str(x):
-			# Bacteria
+			# Viruses that attack Bacteria
+			store = './dat/bacteria_virus/'
+			path_to_dir(store)
 			unwanted_vert = [
 				'14', '146', '160', '140', '142', '141', '113',
 				'114', '165', '163'
@@ -218,8 +230,14 @@ if __name__ == '__main__':
 			unwanted_vert.extend(genetic)
 			names = viruses('http://viralzone.expasy.org' + str(x), 'all_by_species', unwanted_vert)
 			print(names)
+			# for virus in names:
+			# 	virus_url = 'http://viralzone.expasy.org' + str(virus)
+			# 	virus_tax_num = download(virus_url)
+				# ftp_download(virus_tax_num, store)
+			fetch.taxonomy(store, './out/bacteria_viruses/', None)
+			break
 		elif '663' in str(x):
-			# Archaea
+			# Viruses that attack Archaea
 			unwanted_vert = [
 			'3016', '713', '2918', '20', '234', '535',
 			'143', '140', '159', '4742', '2576'
@@ -227,3 +245,8 @@ if __name__ == '__main__':
 			unwanted_vert.extend(genetic)
 			names = viruses('http://viralzone.expasy.org' + str(x), 'all_by_species', unwanted_vert)
 			print(names)
+			for virus in names:
+				virus_url = 'http://viralzone.expasy.org' + str(virus)
+				virus_tax_num = download(virus_url)
+				ftp_download(virus_tax_num, store)
+			fetch.taxonomy(store, './out/archaea_virus/', None)

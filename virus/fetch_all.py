@@ -4,10 +4,8 @@ from bs4 import BeautifulSoup
 from ftplib import FTP
 import fetch
 
-sys.path.insert(0, '/home/pragya/Documents/GitHub/Protein-Sequence-Parser/')
+sys.path.insert(0, '/home/pragya/Documents/GitHub/pragyajswl/Protein-Sequence-Parser/')
 import parser
-
-# parser.viruses()
 
 '''
 Script to find proteomes of all viruses whose hosts are
@@ -44,7 +42,7 @@ def host_species(url, search):
 				hostnum.extend(re.findall('\d+', str(link.get('href'))))
 			else:
 				pass
-	# print(hostnum)
+	print(hostnum)
 	print(count)
 	return hosts
 

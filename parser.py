@@ -144,14 +144,15 @@ def parse(out, species):
 		add(count)
 		name = str.split(file, '.')[0]
 		plot(count, species, name)
-		# if j == 5:
-		# 	break
+		if j == 5:
+			break
 	
 	# print(len(save))
 	jsonify(save)
 	print(species)
 	for x in save:
 		name = str.split(str(x), '.')[0]
+		print(name)
 		percentage(save[x], total, species, name)
 
 
@@ -178,22 +179,22 @@ Example - Suppose we wish to know to percentage of an amino acid, say L, in a
 virus X when compared to the total amount of L in the viruses species.
 '''
 def percentage(count, total, species, name=None):
-	print(species)
 	perc = {}
 	k = 0
 	for i in count.keys():
 		if not len(perc) == 21:
 			j = [j for j in total.keys()]
 			if i == str(j[k]):
-				print('i: ' + str(int(count[i])))
-				print(int(total[i]))
+				print(str(i) + ' in this organism: ' + str(int(count[i])))
+				print('Total ' + str(i) + ' in the species ' + str(species) +
+					': ' + str(int(total[i])))
 				perc[i] = (float(count[i])/float(total[j[k]]))*100
 				k+=1
 			else:
 				pass
 	print('Percentage of amino acid in each organism with respect to the total amino acid in its species.')
 	jsonify(perc)
-	plot(perc, species, name)
+	plot(perc, species, name, 'percent')
 
 
 def path_to_dir(out):
@@ -215,8 +216,11 @@ def jsonify(count):
 
 
 # Plot a bar graph for the number of each amino acid in the proteome sequence.
-def plot(count, species, name):
-	figs = './plots/' + str(species) + '/'
+def plot(count, species, name, location=None):
+	if location == None:
+		figs = './plots/' + str(species) + '/'
+	else:
+		figs = './plots/' + str(species) + '/' + str(location) + '/'
 	path_to_dir(figs)
 	filename = str(figs) + str(name) + '.png'
 	plt.figure().canvas.set_window_title(str(name))

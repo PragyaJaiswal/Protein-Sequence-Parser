@@ -60,3 +60,6 @@ out/
 dat/
 plots/
 stage/dl
+virus/dat/
+virus/out/
+stage/

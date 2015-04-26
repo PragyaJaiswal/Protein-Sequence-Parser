@@ -107,7 +107,7 @@ def viruses():
 	parse(out, str(uniprot_data.species))
 
 
-def parse(out, species):
+def parse(out, species, plot_loc=None):
 	datafiles = os.listdir(out)
 	j = 0
 	save = {}
@@ -135,25 +135,26 @@ def parse(out, species):
 			pass
 		else:
 			save[str(file)] = count
-			# print(save[str(file)])
-			# print(save)
 
 		j+=1
 		print('No. of files processed: ' + str(j))
-		jsonify(count)
-		add(count)
+		# print(count)
+		total = add(count)
 		name = str.split(file, '.')[0]
-		plot(count, species, name)
-		if j == 5:
-			break
+		# plot(count, species, name, plot_loc)
+		# if j == 5:
+		# 	break
 	
 	# print(len(save))
-	jsonify(save)
+	# jsonify(save)
 	print(species)
 	for x in save:
 		name = str.split(str(x), '.')[0]
-		print(name)
-		percentage(save[x], total, species, name)
+		perc = percentage(save[x], total, species, name)
+		save[x] = perc
+		loc = plot_loc + '/percent/'
+		plot(perc, species, name, loc)
+	jsonify(save)
 
 
 '''
@@ -169,7 +170,8 @@ def add(count):
 		else:
 			total[x] = count[x]
 	print('Printing the total amino acids in the species for the files processed: ')
-	jsonify(total)
+	print(total)
+	return total
 
 
 '''
@@ -185,16 +187,16 @@ def percentage(count, total, species, name=None):
 		if not len(perc) == 21:
 			j = [j for j in total.keys()]
 			if i == str(j[k]):
-				print(str(i) + ' in this organism: ' + str(int(count[i])))
-				print('Total ' + str(i) + ' in the species ' + str(species) +
-					': ' + str(int(total[i])))
+				# print(str(i) + ' in this organism: ' + str(int(count[i])))
+				# print('Total ' + str(i) + ' in the species ' + str(species) +
+				# 	': ' + str(int(total[i])))
 				perc[i] = (float(count[i])/float(total[j[k]]))*100
 				k+=1
 			else:
 				pass
 	print('Percentage of amino acid in each organism with respect to the total amino acid in its species.')
-	jsonify(perc)
-	plot(perc, species, name, 'percent')
+	# jsonify(perc)
+	return perc
 
 
 def path_to_dir(out):
@@ -210,8 +212,14 @@ def path_to_dir(out):
 
 
 # Export dictionary to JSON for showing count in a presentable form.
-def jsonify(count):
+def jsonify(count, location=None):
 	a = json.dumps(count, sort_keys=True, indent=4, separators=(',', ': '))
+	if location == None:
+		with open('data.json', 'a+') as outfile:
+			outfile.write(a)
+	else:
+		with open(str(location), 'a+') as outfile:
+			outfile.write(a)
 	print(a)
 
 
@@ -220,7 +228,7 @@ def plot(count, species, name, location=None):
 	if location == None:
 		figs = './plots/' + str(species) + '/'
 	else:
-		figs = './plots/' + str(species) + '/' + str(location) + '/'
+		figs = str(location) + '/'
 	path_to_dir(figs)
 	filename = str(figs) + str(name) + '.png'
 	plt.figure().canvas.set_window_title(str(name))

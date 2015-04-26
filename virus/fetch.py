@@ -3,7 +3,7 @@ import re, os, json, sys, gzip, urllib, requests, httplib2
 from bs4 import BeautifulSoup
 from ftplib import FTP
 
-sys.path.insert(0, '/home/pragya/Documents/GitHub/Protein-Sequence-Parser/')
+sys.path.insert(0, '/home/pragya/Documents/GitHub/pragyajswl/Protein-Sequence-Parser/')
 import parser
 
 # parser.viruses()
@@ -115,6 +115,7 @@ def path_to_dir(out):
 
 
 def taxonomy(store, out = None, plot_loc = None):
+	print('In taxonomy. Writing output files.')
 	i = 0
 	j = 0
 	

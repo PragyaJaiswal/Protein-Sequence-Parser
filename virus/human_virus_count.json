@@ -1,6 +1,7 @@
 // Count of amino acid in viruses that attack humans.
-// List of viruses obtained from www.viralzone.com
+// List of viruses obtained from viralzone.expasy.org
 // Length of sample of viruses is 117.
+// File names denote the virus names in UniProt format.
 {
     "UP000000278_766194.txt": {
         "A": 259,

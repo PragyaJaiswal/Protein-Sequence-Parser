@@ -219,7 +219,7 @@ if __name__ == '__main__':
 				virus_tax_num = download(virus_url)
 				ftp_download(virus_tax_num, store)
 			fetch.taxonomy(store, './out/eukaryotic_organism_virus/', None)
-		elif '256' in str(x):
+		if '256' in str(x):
 			# Viruses that attack Bacteria
 			store = './dat/bacteria_virus/'
 			path_to_dir(store)
@@ -228,12 +228,12 @@ if __name__ == '__main__':
 				'114', '165', '163'
 				]
 			unwanted_vert.extend(genetic)
-			names = viruses('http://viralzone.expasy.org' + str(x), 'all_by_species', unwanted_vert)
-			print(names)
+			# names = viruses('http://viralzone.expasy.org' + str(x), 'all_by_species', unwanted_vert)
+			# print(names)
 			# for virus in names:
 			# 	virus_url = 'http://viralzone.expasy.org' + str(virus)
 			# 	virus_tax_num = download(virus_url)
-				# ftp_download(virus_tax_num, store)
+			# 	ftp_download(virus_tax_num, store)
 			fetch.taxonomy(store, './out/bacteria_viruses/', None)
 			break
 		elif '663' in str(x):

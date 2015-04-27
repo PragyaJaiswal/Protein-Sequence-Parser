@@ -1,5 +1,6 @@
 // Count of amino acid in viruses that attack bacteria.
 // List of viruses obtained from www.viralzone.com
+// Length of sample of viruses is 49.
 {
     "UP000000339_867696.txt": {
         "A": 3221,

@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 
-import numpy
+import numpy as np
 import operator
 import json
 from collections import Counter
 from sklearn.cluster import KMeans
+from sklearn.decomposition import PCA
+from matplotlib import pyplot
 
 # Amino acid patterns: A   C   D   E   F   G   H   I   K   L   M   N   P   Q   R   S   T   V   W   X   Y
 
@@ -118,39 +120,61 @@ Virus = {
 }
 
 class Routine:
-    def kMean():
+    def cluster_using_kMean():
         concat_eukaryotes   = [pattern for organism, pattern in Mammalia.items()]
         concat_eukaryotes  += [pattern for organism, pattern in Actinopterygii.items()]
         concat_eukaryotes  += [pattern for organism, pattern in Aves.items()]
         concat_prokaryotes  = [pattern for organism, pattern in Bacteria.items()]
         concat_virus        = [pattern for organism, pattern in Virus.items()]
 
-        concat_all = concat_eukaryotes + concat_prokaryotes + concat_virus
-
+        # Initialize the KMean object for three cluster aims.
         three_mean = KMeans(3)
+
+        # Fit all the data, concatenated
         three_mean.fit(concat_eukaryotes + concat_prokaryotes + concat_virus)
+
+        labels = three_mean.labels_
+        centroids = three_mean.cluster_centers_
 
         results = []
 
-        for pattern in concat_eukaryotes:
-            results.append(three_mean.predict(pattern)[0])
+        def assess(_set):
+            results = []
+            for pattern in _set:
+                results.append(three_mean.predict(pattern)[0])
 
-        print(Counter(results).most_common(1))
+            return Counter(results).most_common(1)[0]
 
-        result2 = []
+        out = "Class {0} clusters at partition number `{1}` with {2} out of {3} samples."
 
-        for pattern in concat_prokaryotes:
-            result2.append(three_mean.predict(pattern)[0])
-        print(Counter(result2).most_common(1))
+        assess_eukaryotes = assess(concat_eukaryotes)
+        assess_virus = assess(concat_virus)
+        assess_prokaryotes = assess(concat_prokaryotes)
 
-        result3 = []
+        print(out.format("Eukayotes", assess_eukaryotes[0], assess_eukaryotes[1], len(concat_eukaryotes)))
+        print(out.format("Virus    ", assess_virus[0], assess_virus[1], len(concat_virus)))
+        print(out.format("Bacteria ", assess_prokaryotes[0], assess_prokaryotes[1], len(concat_prokaryotes)))
 
-        for pattern in concat_virus:
-            result3.append(three_mean.predict(pattern)[0])
-        print(Counter(result3).most_common(1))
+    def cluster_using_pca():
+        concat_eukaryotes   = [pattern for organism, pattern in Mammalia.items()]
+        concat_eukaryotes  += [pattern for organism, pattern in Actinopterygii.items()]
+        concat_eukaryotes  += [pattern for organism, pattern in Aves.items()]
+        concat_prokaryotes  = [pattern for organism, pattern in Bacteria.items()]
+        concat_virus        = [pattern for organism, pattern in Virus.items()]
+
+        out = "Class {0} clusters at point {1})"
+
+        print(out.format("Eukayotes", PCA(n_components=2).fit([i for i in concat_eukaryotes]).explained_variance_ratio_))
+        print(out.format("Virus    ", PCA(n_components=2).fit([i for i in concat_prokaryotes]).explained_variance_ratio_))
+        print(out.format("Bacteria ", PCA(n_components=2).fit([i for i in concat_virus]).explained_variance_ratio_))
+
+    def cluster_using_PPMCC():
+        concat_eukaryotes   = [pattern for organism, pattern in Mammalia.items()]
+        concat_eukaryotes  += [pattern for organism, pattern in Actinopterygii.items()]
+        concat_eukaryotes  += [pattern for organism, pattern in Aves.items()]
+        concat_prokaryotes  = [pattern for organism, pattern in Bacteria.items()]
+        concat_virus        = [pattern for organism, pattern in Virus.items()]
 
 
-
-        #print(len(concat))
-
-Routine.kMean()
+Routine.cluster_using_kMean()
+Routine.cluster_using_pca()

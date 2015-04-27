@@ -1,5 +1,5 @@
 #!/usr/bin/python
-import re, os, json, requests, urllib, gzip
+import re, os, sys, json, requests, urllib, gzip
 from os import listdir
 import matplotlib.pyplot as plt
 from ftplib import FTP
@@ -53,21 +53,32 @@ Creates another output file with the entire proteome sequene only
 This proteome sequene is no more in FASTA format.
 '''
 
-def viruses():
+def viruses(species=None, store=None):
 	i = 0
 	j = 0
 
 	'''
 	Specify the location where you wish to store the files containing only the
 	entire proteome sequence and not the FASTA format sequence.
-	'''	
-	out = './out/' + str(uniprot_data.species) + '/'
+	'''
 
+	if species == None:
+		out = './out/' + str(uniprot_data.species) + '/'
+	else:
+		out = './out/' + str(species) + '/'
+
+	print(out)
 	path_to_dir(out)
 
-	# List of all the files that have been downloaded.	
-	files=os.listdir(uniprot_data.store)
 
+	# List of all the files that have been downloaded.	
+	if store == None:
+		files = os.listdir(uniprot_data.store)
+		files.sort()
+	else:
+		files = os.listdir(store)
+
+	print(files[0])
 	print("Virus proteomes being processed.")
 
 	for file in files:
@@ -77,15 +88,16 @@ def viruses():
 		# print(bool(re.search('additional', str(file))))
 
 		if bool(re.search('additional', file)):
-			with gzip.open(uniprot_data.store + str(file), 'r') as reading:
-				data = reading.readlines()
-				print('Pre: ' + str(pre))
-				prev = open(str(pre), 'w+')
-				for line in data:
-					if line.startswith('>') or line.startswith('transcript_biotype'):
-						pass
-					else:
-						prev.write(line)
+			pass
+			# with gzip.open(uniprot_data.store + str(file), 'r') as reading:
+			# 	data = reading.readlines()
+			# 	print('Pre: ' + str(pre))
+			# 	prev = open(str(pre), 'w+')
+			# 	for line in data:
+			# 		if line.startswith('>') or line.startswith('transcript_biotype'):
+			# 			pass
+			# 		else:
+			# 			prev.write(line)
 		else:
 			with gzip.open(uniprot_data.store + str(file), 'r') as infile:
 				data = infile.readlines()
@@ -107,15 +119,16 @@ def viruses():
 	parse(out, str(uniprot_data.species))
 
 
-def parse(out, species):
+def parse(out, species, plot_loc=None):
 	datafiles = os.listdir(out)
 	j = 0
+	total_amino_acid = 0
 	save = {}
 	for file in datafiles:
 		with open(out + str(file), 'r') as outfile:
 			print("Reading sequence from file: " + str(file))
 			seq = outfile.read()
-
+			total_amino_acid+=len(seq)
 			"""
 			Counts the occurence of each
 			character in the sequence.
@@ -123,7 +136,7 @@ def parse(out, species):
 			
 			count={}		# Fixed the reported error. Credits - Devesh Khandelwal.
 			for char in seq:
-				if char == '\n' or char == '\x00' or char == '*' or char == 'X':
+				if char == '\n' or char == '\x00' or char == '*':
 					pass
 				else:
 					if char in count:
@@ -135,26 +148,40 @@ def parse(out, species):
 			pass
 		else:
 			save[str(file)] = count
-			# print(save[str(file)])
-			# print(save)
 
 		j+=1
 		print('No. of files processed: ' + str(j))
-		jsonify(count)
-		add(count)
-		name = str.split(file, '.')[0]
-		plot(count, species, name)
-		if j == 5:
-			break
-	
-	# print(len(save))
 	jsonify(save)
-	print(species)
-	for x in save:
-		name = str.split(str(x), '.')[0]
-		print(name)
-		percentage(save[x], total, species, name)
+		# # print(count)
+		# total = add(count)
+		# name = str.split(file, '.')[0]
+		# # plot(count, species, name, plot_loc)
+		# # if j == 5:
+		# # 	break
+		# print(total_amino_acid)
+		# scaled_count = scale(count, total_amino_acid)
+		# jsonify(scaled_count)
 
+	# print(total)
+	# print(save)
+	# print(len(save))
+	# # jsonify(save)
+	# print(species)
+	# for x in save:
+	# 	name = str.split(str(x), '.')[0]
+	# 	print(name)
+	# 	perc = percentage(save[x], total, species, name)
+	# 	print(perc)
+	# 	save[x] = perc
+	# 	# loc = plot_loc + '/percent/'
+	# 	# plot(perc, species, name, loc)
+	# jsonify(save)
+
+
+def scale(count, total_amino_acid):
+	for x in count:
+		count[x] = (count[x]/total_amino_acid)
+	return count
 
 '''
 Adds the total number of amino acids in the species.
@@ -169,7 +196,8 @@ def add(count):
 		else:
 			total[x] = count[x]
 	print('Printing the total amino acids in the species for the files processed: ')
-	jsonify(total)
+	# print(total)
+	return total
 
 
 '''
@@ -180,21 +208,16 @@ virus X when compared to the total amount of L in the viruses species.
 '''
 def percentage(count, total, species, name=None):
 	perc = {}
+	visited = []
 	k = 0
 	for i in count.keys():
-		if not len(perc) == 21:
-			j = [j for j in total.keys()]
-			if i == str(j[k]):
-				print(str(i) + ' in this organism: ' + str(int(count[i])))
-				print('Total ' + str(i) + ' in the species ' + str(species) +
-					': ' + str(int(total[i])))
-				perc[i] = (float(count[i])/float(total[j[k]]))*100
-				k+=1
-			else:
-				pass
-	print('Percentage of amino acid in each organism with respect to the total amino acid in its species.')
-	jsonify(perc)
-	plot(perc, species, name, 'percent')
+		if i in total.keys() and not i in visited:
+			# print(i)
+			print(total[i])
+			# print(total[(total.keys()).index(i)])
+			visited.append(i)
+			perc[i] = (float(count[i]))/(float(total[i]))*100
+	return perc
 
 
 def path_to_dir(out):
@@ -210,9 +233,15 @@ def path_to_dir(out):
 
 
 # Export dictionary to JSON for showing count in a presentable form.
-def jsonify(count):
+def jsonify(count, location=None):
 	a = json.dumps(count, sort_keys=True, indent=4, separators=(',', ': '))
-	print(a)
+	if location == None:
+		with open('virus_count.json', 'a+') as outfile:
+			outfile.write(a)
+	else:
+		with open(str(location), 'a+') as outfile:
+			outfile.write(a)
+	# print(a)
 
 
 # Plot a bar graph for the number of each amino acid in the proteome sequence.
@@ -220,7 +249,7 @@ def plot(count, species, name, location=None):
 	if location == None:
 		figs = './plots/' + str(species) + '/'
 	else:
-		figs = './plots/' + str(species) + '/' + str(location) + '/'
+		figs = str(location) + '/'
 	path_to_dir(figs)
 	filename = str(figs) + str(name) + '.png'
 	plt.figure().canvas.set_window_title(str(name))
@@ -233,3 +262,4 @@ def plot(count, species, name, location=None):
 if __name__ == '__main__':
 	mammals()
 	viruses()
+	viruses('Bacteria')

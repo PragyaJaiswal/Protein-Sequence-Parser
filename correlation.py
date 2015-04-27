@@ -3,9 +3,11 @@
 import numpy
 import operator
 import json
+from collections import Counter
+from sklearn.cluster import KMeans
+from sklearn import svm
 
 # Amino acid patterns: A   C   D   E   F   G   H   I   K   L   M   N   P   Q   R   S   T   V   W   X   Y
-
 mammals = {
     "ailuropoda_melanoleuca": [1452967, 484494, 824110, 1251596, 646892, 1462850, 536671, 720501, 988191, 1896108, 390854, 607705, 1370815, 924544, 1283714, 1696490, 1081713, 1179558, 283121, 4923, 413899],
     "bos_taurus": [1446765, 472110, 831600, 1265074, 643521, 1440962, 523863, 723326, 990748, 1900894, 389589, 597870, 1348608, 927135, 1220572, 1658309, 1057106, 1156767, 276947, 1335, 418014],
@@ -114,7 +116,21 @@ test = {
         "Mammalia",
         [1412824, 474451, 833798, 1270944, 644266, 1381835, 539359, 755587, 1038099, 1881658, 409047, 637291, 1290126, 935722, 1171106, 1637697, 1068467, 1148120, 272175, 43330, 435931]
     ],
+}
 
+cotest = {
+    "pan_troglodytes": [1370118, 440640, 802393, 1442470, 598212, 1516451, 499163, 756392, 1010123, 1780423, 555772, 817943, 1258898, 908463, 1162067, 1573036, 1006884, 1082120, 421905, 4264, 404203],
+    "papio_anubis": [1374208, 445211, 808076, 1274097, 608149, 1375623, 510011, 717566, 1002541, 1780783, 387582, 600550, 1256068, 887052, 1158060, 1564253, 1014643, 1096223, 259255, 3211, 407448],
+    "pongo_abelii": [1318470, 436915, 770439, 1182477, 592901, 1290982, 492866, 697553, 946405, 1734729, 377248, 584267, 1184945, 862723, 1078065, 1500981, 963833, 1048802, 253619, 6428, 399411],
+    "procavia_capensis": [1365181, 464832, 828774, 1229225, 601719, 1323031, 526482, 735243, 1046873, 1848604, 409898, 629467, 1221318, 944441, 1186137, 1640513, 1152222, 1168188, 279266, 33651, 418552],
+    "pteropus_vampyrus": [1514950, 472141, 821655, 1218079, 620560, 1454707, 522207, 682620, 938683, 1818471, 374916, 575591, 1382239, 879593, 1361384, 1677064, 1072855, 1146514, 278342, 13514, 385528],
+    "rattus_norvegicus": [1376121, 482334, 908833, 1525704, 689235, 1356892, 549807, 829990, 1166311, 1946911, 449373, 690446, 1200480, 961907, 1192816, 1718840, 1142891, 1254399, 262044, 2810, 490282],
+    "sarcophilus_harrisii": [969231, 309428, 687680, 1165948, 517112, 1039311, 357095, 684476, 943656, 1424799, 322884, 554921, 927676, 705885, 877301, 1259115, 798408, 844650, 193515, 5822, 364009],
+    "sorex_araneus": [1571056, 509272, 962756, 1367615, 686771, 1521734, 615145, 882198, 1123084, 2030092, 496562, 741745, 1411272, 1018260, 1486206, 1817136, 1197126, 1203530, 336063, 40210, 474176],
+    "sus_scrofa": [1516942, 491426, 846161, 1300174, 669809, 1535786, 545895, 739865, 1032338, 1971539, 398744, 617025, 1441166, 958263, 1302633, 1725587, 1084920, 1175903, 294400, 2792, 419242],
+    "tarsius_syrichta": [1127543, 411089, 726127, 1088714, 570343, 1142745, 480182, 697072, 951165, 1599189, 369531, 577944, 1058054, 816520, 965786, 1433339, 941172, 981097, 244486, 44484, 382927],
+    "tupaia_belangeri": [1461369, 502531, 855806, 1298758, 654771, 1482282, 642267, 780505, 1091654, 1914259, 451683, 612403, 1381616, 914743, 1305231, 1752533, 1189220, 1197464, 310032, 21972, 423959],
+    "tursiops_truncatus": [1391746, 444555, 765747, 1170217, 580146, 1391105, 491654, 649923, 916644, 1761124, 348536, 555916, 1310197, 867041, 1211759, 1572903, 1004986, 1089618, 264870, 9434, 376635],
 }
 
 class Score():
@@ -147,8 +163,75 @@ class Score():
         print(scores)
         return scores['closest_to']
 
+"""
+correlations
 for org in test:
     _str = "{0}\t is closest to {1} with respect to amino acids pattern."
     org_close = Score.closest_to(test[org][1])
 
     print(_str.format(org, org_close))
+
+for org in cotest:
+    print(Score.closest_to(cotest[org]))
+"""
+"""
+kmeans
+
+mam_fit = []
+for org, amino_pattern in mammals.items():
+    mam_fit.append(amino_pattern)
+for org, amino_pattern in aves.items():
+    mam_fit.append(amino_pattern)
+for org, amino_pattern in actinopterygii.items():
+    mam_fit.append(amino_pattern)
+
+three_mean = KMeans(3)
+three_mean.fit(mam_fit)
+
+count_ave = 0
+count_act = 0
+
+temp = []
+
+for org, pate in mammals.items():
+    temp.append(three_mean.predict(pate)[0])
+count_mam = Counter(temp).most_common(1)
+
+temp = []
+
+for org, pate in actinopterygii.items():
+    temp.append(three_mean.predict(pate)[0])
+
+count_act = Counter(temp).most_common(1)
+
+temp = []
+
+for org, pate in aves.items():
+    temp.append(three_mean.predict(pate)[0])
+
+count_ave = Counter(temp).most_common(1)
+
+print(count_ave, count_act, count_mam)
+
+"""
+
+"""
+svm
+"""
+X = []
+Y = []
+
+for org, amino_pattern in mammals.items():
+    X.append(amino_pattern)
+    Y.append(1)
+for org, amino_pattern in aves.items():
+    X.append(amino_pattern)
+    Y.append(2)
+for org, amino_pattern in actinopterygii.items():
+    X.append(amino_pattern)
+    Y.append(3)
+
+clf = svm.SVC()
+clf.fit(X, Y)
+
+print(clf.predict(mammals['homo_sapiens']))

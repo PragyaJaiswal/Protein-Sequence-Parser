@@ -1,5 +1,5 @@
-// Count of amino acid in viruses that attack bacteria. List of
-// viruses obtained from www.viralzone.com
+// Count of amino acid in viruses that attack bacteria.
+// List of viruses obtained from www.viralzone.com
 {
     "UP000000339_867696.txt": {
         "A": 3221,

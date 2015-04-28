@@ -121,6 +121,7 @@ Virus = {
 
 class Routine:
     def cluster_using_kMean():
+        print("\n*RUNNING k-Mean test")
         concat_eukaryotes   = [pattern for organism, pattern in Mammalia.items()]
         concat_eukaryotes  += [pattern for organism, pattern in Actinopterygii.items()]
         concat_eukaryotes  += [pattern for organism, pattern in Aves.items()]
@@ -156,25 +157,44 @@ class Routine:
         print(out.format("Bacteria ", assess_prokaryotes[0], assess_prokaryotes[1], len(concat_prokaryotes)))
 
     def cluster_using_pca():
+        print("\n*RUNNING PCA test")
         concat_eukaryotes   = [pattern for organism, pattern in Mammalia.items()]
         concat_eukaryotes  += [pattern for organism, pattern in Actinopterygii.items()]
         concat_eukaryotes  += [pattern for organism, pattern in Aves.items()]
         concat_prokaryotes  = [pattern for organism, pattern in Bacteria.items()]
         concat_virus        = [pattern for organism, pattern in Virus.items()]
 
-        out = "Class {0} clusters at point {1})"
+        out = "Class {0} clusters at point {1}."
 
         print(out.format("Eukayotes", PCA(n_components=2).fit([i for i in concat_eukaryotes]).explained_variance_ratio_))
         print(out.format("Virus    ", PCA(n_components=2).fit([i for i in concat_prokaryotes]).explained_variance_ratio_))
         print(out.format("Bacteria ", PCA(n_components=2).fit([i for i in concat_virus]).explained_variance_ratio_))
 
     def cluster_using_PPMCC():
+        print("\n*RUNNING PPMCC test")
         concat_eukaryotes   = [pattern for organism, pattern in Mammalia.items()]
         concat_eukaryotes  += [pattern for organism, pattern in Actinopterygii.items()]
         concat_eukaryotes  += [pattern for organism, pattern in Aves.items()]
         concat_prokaryotes  = [pattern for organism, pattern in Bacteria.items()]
         concat_virus        = [pattern for organism, pattern in Virus.items()]
 
+        PPMCC_eukaryotes    = np.corrcoef(concat_eukaryotes)
+        PPMCC_prokaryotes   = np.corrcoef(concat_prokaryotes)
+        PPMCC_virus         = np.corrcoef(concat_virus)
+        PPMCC_eukaryote_vs_prokaryote = np.corrcoef(concat_eukaryotes + concat_prokaryotes + concat_virus)
+
+        avg_eukaryotes      = [(sum(i) - 1) / (len(i) - 1) for i in PPMCC_eukaryotes]
+        avg_prokaryotes     = [(sum(i) - 1) / (len(i) - 1) for i in PPMCC_prokaryotes]
+        avg_virus           = [(sum(i) - 1) / (len(i) - 1) for i in PPMCC_virus]
+        avg_eukaryotes_pro  = [(sum(i) - 1) / (len(i) - 1) for i in PPMCC_eukaryote_vs_prokaryote]
+
+        out = "Class {0} has a correlation coefficient of {1}"
+
+        print(out.format("Eukayotes                         ", (sum(avg_eukaryotes) / len(avg_eukaryotes))))
+        print(out.format("Bacteria                          ", (sum(avg_prokaryotes) / len(avg_prokaryotes))))
+        print(out.format("Virus                             ", (sum(avg_virus) / len(avg_virus))))
+        print(out.format("Eukaryote vs Prokaryotes and Virus", (sum(avg_eukaryotes_pro) / len(avg_eukaryotes_pro))))
 
 Routine.cluster_using_kMean()
 Routine.cluster_using_pca()
+Routine.cluster_using_PPMCC()

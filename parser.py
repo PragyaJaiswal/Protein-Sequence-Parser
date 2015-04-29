@@ -89,15 +89,15 @@ def viruses(species=None, store=None):
 
 		if bool(re.search('additional', file)):
 			pass
-			# with gzip.open(uniprot_data.store + str(file), 'r') as reading:
-			# 	data = reading.readlines()
-			# 	print('Pre: ' + str(pre))
-			# 	prev = open(str(pre), 'w+')
-			# 	for line in data:
-			# 		if line.startswith('>') or line.startswith('transcript_biotype'):
-			# 			pass
-			# 		else:
-			# 			prev.write(line)
+			with gzip.open(uniprot_data.store + str(file), 'r') as reading:
+				data = reading.readlines()
+				print('Pre: ' + str(pre))
+				prev = open(str(pre), 'w+')
+				for line in data:
+					if line.startswith('>') or line.startswith('transcript_biotype'):
+						pass
+					else:
+						prev.write(line)
 		else:
 			with gzip.open(uniprot_data.store + str(file), 'r') as infile:
 				data = infile.readlines()
@@ -114,8 +114,6 @@ def viruses(species=None, store=None):
 				pre = filename
 				infile.close()
 				print("Amino acid sequence written to the requested file for file " + str(file))
-		# if j == 10:
-		# 	break
 	parse(out, str(uniprot_data.species))
 
 
@@ -136,7 +134,7 @@ def parse(out, species, plot_loc=None):
 			
 			count={}		# Fixed the reported error. Credits - Devesh Khandelwal.
 			for char in seq:
-				if char == '\n' or char == '\x00' or char == '*':
+				if char == '\n' or char == '\x00' or char == '*' or char == 'X':
 					pass
 				else:
 					if char in count:
@@ -155,18 +153,12 @@ def parse(out, species, plot_loc=None):
 		# # print(count)
 		# total = add(count)
 		# name = str.split(file, '.')[0]
-		# # plot(count, species, name, plot_loc)
-		# # if j == 5:
-		# # 	break
+		# plot(count, species, name, plot_loc)
 		# print(total_amino_acid)
 		# scaled_count = scale(count, total_amino_acid)
 		# jsonify(scaled_count)
 
-	# print(total)
-	# print(save)
-	# print(len(save))
-	# # jsonify(save)
-	# print(species)
+
 	# for x in save:
 	# 	name = str.split(str(x), '.')[0]
 	# 	print(name)
@@ -182,6 +174,7 @@ def scale(count, total_amino_acid):
 	for x in count:
 		count[x] = (count[x]/total_amino_acid)
 	return count
+
 
 '''
 Adds the total number of amino acids in the species.
@@ -212,9 +205,7 @@ def percentage(count, total, species, name=None):
 	k = 0
 	for i in count.keys():
 		if i in total.keys() and not i in visited:
-			# print(i)
 			print(total[i])
-			# print(total[(total.keys()).index(i)])
 			visited.append(i)
 			perc[i] = (float(count[i]))/(float(total[i]))*100
 	return perc
@@ -262,4 +253,5 @@ def plot(count, species, name, location=None):
 if __name__ == '__main__':
 	mammals()
 	viruses()
+	# Same can be done for the data of Bcateria obtained from UniProt.
 	viruses('Bacteria')

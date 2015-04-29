@@ -697,48 +697,107 @@ Virus = {
 }
 '''
 
-# class Routine:
-class cluster_using_kMean():
-	concat_mammals   = [pattern for organism, pattern in Mammalia.items()]
+# Cluster between Bacteria and Viruses that attack Bacteria
+def bacteria_as_host():
 	concat_bacteria = [pattern for organism, pattern in Bacteria.items()]
-	# concat_bacteria_virus = [pattern for organism, pattern in Bacteria_attacking_viruses.items()]
-	# concat_humans = [pattern for organism, pattern in Humans.items()]
+	concat_bacteria_virus = [pattern for organism, pattern in Bacteria_attacking_viruses.items()]
+
+	two_mean = KMeans(2)
+	
+	# Fit all the data, concatenated.
+	two_mean.fit(concat_bacteria + concat_bacteria_virus)
+
+	labels =two_mean.labels_
+	centroids = two_mean.cluster_centers_
+
+	results = []
+
+	out = "Class {0} clusters at partition number `{1}` with {2} out of {3} samples."
+
+	assess_bacteria = assess(concat_bacteria, two_mean)
+	assess_bacteria_virus = assess(concat_bacteria_virus, two_mean)
+
+	print(out.format("Bacteria", assess_bacteria[0], assess_bacteria[1], len(concat_bacteria)))
+	print(out.format("Bacteria attacking viruses", assess_bacteria_virus[0], assess_bacteria_virus[1], len(concat_bacteria_virus)))
+
+
+# Cluster between Homo Sapiens and viruses that attack Homo sapiens
+def human_as_host():
+	concat_humans = [pattern for organism, pattern in Humans.items()]
 	concat_human_virus = [pattern for organism, pattern in Human_attacking_viruses.items()]
-	# Initialize the KMean object for three cluster aims.
+
+	two_mean = KMeans(2)
+	
+	# Fit all the data, concatenated.
+	two_mean.fit(concat_humans + concat_human_virus)
+
+	labels =two_mean.labels_
+	centroids = two_mean.cluster_centers_
+
+	results = []
+
+	out = "Class {0} clusters at partition number `{1}` with {2} out of {3} samples."
+
+	assess_humans = assess(concat_humans, two_mean)
+	assess_human_virus = assess(concat_human_virus, two_mean)
+
+	print(out.format("Humans", assess_humans[0], assess_humans[1], len(concat_humans)))
+	print(out.format("Human_attacking_viruses", assess_human_virus[0], assess_human_virus[1], len(concat_human_virus)))
+
+
+# Cluster between bacteria and virus
+def bacteria_vs_virus():
+	concat_bacteria = [pattern for organism, pattern in Bacteria.items()]
+	concat_human_virus = [pattern for organism, pattern in Human_attacking_viruses.items()]
+
 	two_mean = KMeans(2)
 
-	# Fit all the data, concatenated
-	# two_mean.fit(concat_bacteria + concat_bacteria_virus)
-	# two_mean.fit(concat_humans + concat_human_virus)
-	# two_mean.fit(concat_bacteria_virus + concat_human_virus)
 	two_mean.fit(concat_bacteria + concat_human_virus)
 
 	labels = two_mean.labels_
 	centroids = two_mean.cluster_centers_
-	print(labels)
 
 	results = []
 
-	def assess(_set):
+	out = "Class {0} clusters at partition number `{1}` with {2} out of {3} samples."
+
+	assess_bacteria = assess(concat_bacteria, two_mean)
+	assess_human_virus = assess(concat_human_virus, two_mean)
+
+	print(out.format("Bacteria", assess_bacteria[0], assess_bacteria[1], len(concat_bacteria)))
+	print(out.format("Human_attacking_viruses", assess_human_virus[0], assess_human_virus[1], len(concat_human_virus)))
+
+
+# Cluster between viruses that attack Bacteria and those that attack homo sapiens
+def virus():
+	concat_bacteria_virus = [pattern for organism, pattern in Bacteria_attacking_viruses.items()]
+	concat_human_virus = [pattern for organism, pattern in Human_attacking_viruses.items()]
+
+	two_mean = KMeans(2)
+
+	two_mean.fit(concat_bacteria_virus + concat_human_virus)
+
+	labels = two_mean.labels_
+	centroids = two_mean.cluster_centers_
+
+	results = []
+
+	out = "Class {0} clusters at partition number `{1}` with {2} out of {3} samples."
+
+	assess_bacteria_virus = assess(concat_bacteria_virus, two_mean)
+	assess_human_virus = assess(concat_human_virus, two_mean)
+
+	print(out.format("Bacteria_attacking_viruses", assess_bacteria_virus[0], assess_bacteria_virus[1], len(concat_bacteria_virus)))
+	print(out.format("Human_attacking_viruses", assess_human_virus[0], assess_human_virus[1], len(concat_human_virus)))
+
+
+def assess(_set, two_mean):
 		results = []
 		for pattern in _set:
 			results.append(two_mean.predict(pattern)[0])
 		print(Counter(results).most_common())
 		return Counter(results).most_common(1)[0]
 
-	out = "Class {0} clusters at partition number `{1}` with {2} out of {3} samples."
-
-	# assess_mammals = assess(concat_mammals)
-	assess_bacteria = assess(concat_bacteria)
-	# assess_bacteria_virus = assess(concat_bacteria_virus)
-	# assess_humans = assess(concat_humans)
-	assess_human_virus = assess(concat_human_virus)
-
-	# print(out.format("Mammals", assess_mammals[0], assess_mammals[1], len(concat_mammals)))
-	print(out.format("Bacteria", assess_bacteria[0], assess_bacteria[1], len(concat_bacteria)))
-	# print(out.format("Bacteria attacking viruses", assess_bacteria_virus[0], assess_bacteria_virus[1], len(concat_bacteria_virus)))
-	# print(out.format("Humans", assess_humans[0], assess_humans[1], len(concat_humans)))
-	print(out.format("Human_attacking_viruses", assess_human_virus[0], assess_human_virus[1], len(concat_human_virus)))
 
 def cluster_using_pca():
 	# concat_mammals   = [pattern for organism, pattern in Mammalia.items()]
@@ -750,7 +809,10 @@ def cluster_using_pca():
 	# print(out.format("Mammals", PCA(n_components=2).fit([i for i in concat_mammals]).explained_variance_ratio_))
 	print(out.format("Bacteria    ", PCA(n_components=2).fit([i for i in concat_bacteria]).explained_variance_ratio_))
 	print(out.format("Bacteria attacking viruses", PCA(n_components=2).fit([i for i in concat_bacteria_virus]).explained_variance_ratio_))
+	
 
-print(len(Bacteria_attacking_viruses))
-print(len(Human_attacking_viruses))
-cluster_using_kMean()
+
+bacteria_as_host()
+human_as_host()
+bacteria_vs_virus()
+virus()

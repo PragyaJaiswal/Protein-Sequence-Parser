@@ -3,6 +3,7 @@
 import numpy as np
 import operator
 import json
+import math
 from collections import Counter
 from sklearn.cluster import KMeans
 from sklearn.decomposition import PCA
@@ -805,14 +806,25 @@ def cluster_using_pca():
 	concat_bacteria_virus = [pattern for organism, pattern in Bacteria_attacking_viruses.items()]
 
 	out = "Class {0} clusters at point {1})"
+	
+	'''
+	Reduces dimensions down to n_components = 2.The point obtained for each shows the
+	first value as the first component and the second value as the second component.
+	'''
+	reduced_features_1 = PCA(n_components=2).fit([i for i in concat_bacteria]).explained_variance_ratio_
+	reduced_features_2 = PCA(n_components=2).fit([i for i in concat_bacteria_virus]).explained_variance_ratio_
+	
+	# Assuming the two as points on xy plane, calculate the distance between them.
+	print(math.hypot(reduced_features_2[0] - reduced_features_1[0], reduced_features_2[1] - reduced_features_1[1]))
+	# print(math.sqrt((reduced_features_2[0] - reduced_features_1[0])**2 + (reduced_features_2[1] - reduced_features_1[1])**2))
 
 	# print(out.format("Mammals", PCA(n_components=2).fit([i for i in concat_mammals]).explained_variance_ratio_))
-	print(out.format("Bacteria    ", PCA(n_components=2).fit([i for i in concat_bacteria]).explained_variance_ratio_))
-	print(out.format("Bacteria attacking viruses", PCA(n_components=2).fit([i for i in concat_bacteria_virus]).explained_variance_ratio_))
-	
+	# print(out.format("Bacteria    ", PCA(n_components=2).fit([i for i in concat_bacteria]).explained_variance_ratio_))
+	# print(out.format("Bacteria attacking viruses", PCA(n_components=2).fit([i for i in concat_bacteria_virus]).explained_variance_ratio_))
 
 
 bacteria_as_host()
 human_as_host()
 bacteria_vs_virus()
 virus()
+cluster_using_pca()
